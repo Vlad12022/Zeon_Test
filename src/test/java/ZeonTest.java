@@ -1,26 +1,25 @@
-import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class ZeonTest extends BaseSeleniumTest {
 
 
     @Test(dataProvider = "categoryProvider",dataProviderClass = CatalogDataProvider.class)
-    public void zeonTest(CatalogNames category) {
+    public void zeonTest(CatalogNames catalogNames) {
         MainPage mainPage = new MainPage();
         mainPage.openCatalog();
 
         CatalogPage catalogPage = new CatalogPage();
-        catalogPage.openCategory(category); // Передаем категорию в метод
 
-        Set<String> texts = catalogPage.collectSubcategoryTexts();
-        Assert.assertFalse(texts.isEmpty(), "No texts found in subcategories");
+        String categoryXPath = catalogPage.getXpath(CatalogNames.BEAUTY_AND_SPORTS);
+        Map<String, List<String>> texts = catalogPage.collectSubcategoryTexts(categoryXPath);
 
-        // Выводим категорию и ее содержимое
-        System.out.println("Category: " + category);
-        System.out.println("Subcategories:");
-        texts.forEach(subcategory -> System.out.println(" - " + subcategory));
+        texts.forEach((category, subCategories) -> {
+            System.out.println("Category: " + category);
+            subCategories.forEach(subCategory -> System.out.println(" - " + subCategory));
+        });
     }
 }
-

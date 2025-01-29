@@ -2,65 +2,42 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.time.Duration;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 public class CatalogPage extends BaseSeleniumPage {
 
-   @FindBy(xpath = "(//button[@type='button'])[11]")
+    @FindBy(xpath = "(//button[@type='button'])[11]")
     private WebElement homeCategory;
 
-     @FindBy(xpath = "(//div[@class='subcategory-details'])[3]")
+    @FindBy(xpath = "//div[@class='category-details']")
     private List<WebElement> subcategoryHome;
 
     public CatalogPage() {
         PageFactory.initElements(driver, this);
     }
 
-//    //public Set<String> collectSubcategoryTexts() {
-//        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-//        Set<String> texts = new HashSet<>();
-//        // Ожидание видимости подкатегорий
-//        wait.until(ExpectedConditions.visibilityOfAllElements(subcategoryHome));
-//        for (WebElement subcategory : subcategoryHome) {
-//            String subcategoryText = subcategory.getText();
-//            texts.add(subcategoryText);
-//        }
-//        return texts;
-//    }
+    public Map<String, List<String>> collectSubcategoryTexts(String categoryXpath) {
 
-    public void openCategory(CatalogNames catalogNames) {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//section[@id='catalog']")));
+        Map<String, List<String>> categoriesText = new HashMap<>();
+        WebElement category = driver.findElement(By.xpath(categoryXpath));
+        String categoryText = category.getText();
+        category.click();
 
-        // Получаем XPath для нужной категории
-        String categoryXpath = getXpath(catalogNames);
-        WebElement categoryElement = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(categoryXpath)));
+        List<WebElement> subCategories = category.findElements(By.xpath("//div[@class='category-details']"));
+        List<String> subCategoriesTexts = new ArrayList<>();
 
-        // Кликаем по категории
-        categoryElement.click();
-    }
-    public Set<String> collectSubcategoryTexts() {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(30));
-        Set<String> texts = new HashSet<>();
-        // Ожидание видимости подкатегорий
-        wait.until(ExpectedConditions.visibilityOfAllElements(subcategoryHome));
-        for (WebElement subcategory : subcategoryHome) {
-            String subcategoryText = subcategory.getText();
-            texts.add(subcategoryText);
+        for (WebElement subCategory : subCategories) {
+            String subCategoryText = subCategory.getText();
+            subCategoriesTexts.add(subCategoryText);
         }
-        return texts;
+        categoriesText.put(categoryText, subCategoriesTexts);
+
+        return categoriesText;
     }
 
-
-    public String getXpath(CatalogNames catalogNames){
-        return String.format(Constants.CATALOG_ALL_CATEGORIES_XPATH,catalogNames.getIndex());
-  }
+    public String getXpath(CatalogNames catalogNames) {
+        return String.format(Constants.CATALOG_ALL_CATEGORIES_XPATH, catalogNames.getIndex());
+    }
 
 }
 
